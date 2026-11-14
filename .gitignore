@@ -1,0 +1,16 @@
+# Yours, made on first run - never shared
+*.ini
+errors.log
+previous version/
+*.tmp
+
+# What the tests write
+tests/results-*.txt
+
+# What build.ps1 makes, and a local AutoHotkey for it
+dist/
+AutoHotkey64.exe
+
+# The script runs as its own <name>.exe, a renamed copy of AutoHotkey the kit
+# makes beside it (lib\Kit\Exe.ahk) - made on each PC, never shared
+/*.exe
