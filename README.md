@@ -1,8 +1,8 @@
 # Global Scroller
 
-**Scroll any window by moving your mouse - the browser's middle-click
-autoscroll, in every program. Plus a touch-style drag for pages that should
-move like on a phone.**
+**A browser-style autoscroller that works in every program - for a broken
+middle mouse button, or when Windows Ink is turned off. An alternative to
+middle-click scrolling and to Windows Ink's drag-to-scroll.**
 
 I made it for drawing tablets with **Windows Ink turned off**. A lot of us turn
 Ink off because it gets in the way of drawing apps, and then the pen stops
