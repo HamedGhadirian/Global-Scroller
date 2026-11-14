@@ -2,8 +2,8 @@
 ; Scroll.ahk - the scrolling itself
 ;================================================================================
 ; TWO KEYS, each changeable in Settings:
-;   Scroll      Win + Shift + Right-click - wheel steps, or smooth ([Scroll] Mode)
-;   Touch drag  Win + Alt + Right-click   - a made-up finger drags the page
+;   Scroll      Win + Ctrl + click  - wheel steps, or smooth ([Scroll] Mode)
+;   Touch drag  Win + Shift + click - a made-up finger drags the page
 ;
 ; The scroll key puts a round mark where you
 ; clicked. Move away from it and the window scrolls that way - the further
@@ -37,7 +37,7 @@
 ;                that counts every piece as a whole notch races - use wheel
 ;                there.
 ; TOUCH DRAG has its own key. Experimental. While you hold its modifiers
-; (Win and Alt), every right-click-drag drags the page, and it glides on when
+; (Win and Shift), every drag with its button drags the page, and it glides on when
 ; you let go of the button. (Hold off: it follows the pointer until a click.)
 ; Touch only works in programs that take touch; others are handed it as a
 ; left-button drag, which may select text or draw.
@@ -67,7 +67,7 @@ class Scroll {
     static trig := "", mods := [], waits := [], stopKeys := []
     static hidden := false, hiddenKeys := []
     static ticker := "", stopper := "", swallow := "", piece := 30
-    static drag := false            ; touch: a drag per right-click while the keys are held
+    static drag := false            ; touch: a drag per click of its button while the keys are held
     ; for the tests: a pointer and a "still held?" of their own, and no live
     ; keys, so a real click is never swallowed
     static pointer := "", holding := "", clicks := true

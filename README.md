@@ -14,18 +14,18 @@ AutoHotkey v2 · Windows 10 and 11 · no account, no tracking
 
 Two keys, two ways to move a page:
 
-**Scroll: Win + Shift + right-click.** A small round mark shows up where you
-clicked.
+**Scroll: Win + Ctrl + click.** A small round mark shows up where you
+clicked. With a pen, that's just a touch of the tip.
 
 - Move away from the mark. The window scrolls that way, and the further you go,
   the faster. Come back to the mark and it stops. Sideways works too.
-- **Hold or tap.** Keep Win + Shift held and it scrolls while you hold; let go
+- **Hold or tap.** Keep Win + Ctrl held and it scrolls while you hold; let go
   and it stops. Or let go right away (under 0.3 s) and it stays on until
   **Esc or any click**. That click does nothing else.
-- With a mouse you can hold the right button instead of the keys.
+- With a mouse you can hold the button instead of the keys.
 
-**Touch drag: Win + Alt + right-click** (experimental). While you hold Win +
-Alt, every right-click-drag drags the page like a finger on a phone, and it
+**Touch drag: Win + Shift + click** (experimental). While you hold Win +
+Shift, every click-drag drags the page like a finger on a phone, and it
 glides on when you let go of the button. Let go of the keys and everything is
 normal again. It only works in programs that understand touch (browsers, most
 modern apps); others may take it as a mouse drag and select text or draw, so
@@ -71,8 +71,8 @@ It's all in `Global-Scroller.ini` beside the script too, if you'd rather edit a 
   installs without your click. Settings can turn the question off. That
   question is the only thing it sends anywhere.
 - **The held keys stay hidden**: while you hold them to scroll, other programs
-  don't see them, so Shift + wheel or Alt + wheel shortcuts don't fire by
-  accident.
+  don't see them, so Ctrl + wheel (zoom) or Shift + wheel shortcuts don't fire
+  by accident.
 - A few Store apps, like Settings, stop scrolling once the pointer leaves their
   window.
 - If an old program scrolls way too fast, set **Smallest step** to 120.

@@ -2,6 +2,12 @@
 
 Each version's notes, newest first. The release on GitHub is built from the section with its number.
 
+## 0.2.1 — 2026-11-14
+
+- **New keys, on the left click**: **Win + Ctrl + click** scrolls, **Win + Shift + click** is touch drag. With a pen, a touch of the tip is enough now. If you never changed your keys, these replace the old right-click ones. The old ones still work if you set them in Settings > Keys.
+- **Clearer update message**: when GitHub has had too many questions from your connection in the last hour, the update check now says so, instead of "Could not reach GitHub (HTTP 403)".
+- **Fixed**: "Update now" could refuse to finish in some folders; it now works wherever the app is.
+
 ## 0.2.0 — 2026-11-14
 
 The first public version.

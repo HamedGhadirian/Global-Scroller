@@ -5,7 +5,7 @@
 
 ; MAJOR.MINOR.PATCH - a dash makes it a test version. The release build reads
 ; it from this line, and the tag that starts the build must match it.
-global GlobalScrollerVersion := "0.2.0"
+global GlobalScrollerVersion := "0.2.1"
 
 ; The settings window's own rows, under GENERAL and KEYS (Kit\SettingsWin.ahk
 ; builds the window and saves each row the moment it changes; Scroll.Load
@@ -16,10 +16,10 @@ GlobalScrollerRows() {
             , choices: ["wheel", "smooth"]
             , names: ["Wheel steps (works everywhere)", "Smooth wheel (finer steps)"]
             , hint: "Smooth wheel: the same, in steps five times smaller. If a program races with it, use wheel steps there. "
-                . "Touch drag has its own key (KEYS): hold Win and Alt, and every right-click-drag drags the page like a finger; "
+                . "Touch drag has its own key (KEYS): hold its keys, and every drag with its button drags the page like a finger; "
                 . "it glides on when you let go. Only in programs that take touch; others may select or draw instead."}
         , {kind: "bool", sect: "Scroll", key: "Hold", def: 1, label: "Scroll while the keys are held"
-            , hint: "Keep the key's modifiers (Win and Shift, or Win and Alt) or its mouse button held: it scrolls while you hold, and stops when you let go. "
+            , hint: "Keep the key's modifiers (Win and Ctrl, for example) or its mouse button held: it scrolls while you hold, and stops when you let go. "
                 . "Let go quickly and it stays on until a click or Esc. Off: it waits for you to let go, then stays on."}
         , {kind: "num", sect: "Scroll", key: "TapTime", def: 300, min: 0, max: 2000, unit: "ms", label: "Quick let-go"
             , hint: "Let go sooner than this and it stays on. Later, and letting go ends it."}
@@ -44,8 +44,8 @@ GlobalScrollerRows() {
 GlobalScrollerIniTemplate() {
     head := "
     (
-; Global Scroller settings - Win+Shift+Right-click, then move the mouse to scroll.
-; Win+Alt+Right-click-drag drags the page like a finger.
+; Global Scroller settings - Win+Ctrl+click, then move the mouse to scroll.
+; Win+Shift+click-drag drags the page like a finger.
 ;
 ; Easiest from the tray menu: Settings. Everything in this file is there, and
 ; a change made there works at once. If you edit this file by hand instead,
@@ -85,8 +85,8 @@ Sideways=1
 ;          everywhere.
 ; smooth = the same in steps five times smaller, so the page moves a few
 ;          pixels at a time. If a program races with it, use wheel there.
-; Touch drag is not a mode: it has its own key (Win+Alt+Right-click). Hold
-; Win and Alt, and every right-click-drag drags the page; it glides on when
+; Touch drag is not a mode: it has its own key (Win+Shift+click). Hold
+; Win and Shift, and every click-drag drags the page; it glides on when
 ; you let go. EXPERIMENTAL - only in programs that take touch; others may
 ; get a left-button drag (selecting, drawing).
 Mode=wheel
