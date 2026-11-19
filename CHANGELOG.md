@@ -2,6 +2,13 @@
 
 Each version's notes, newest first. The release on GitHub is built from the section with its number.
 
+## 0.2.2 — 2026-11-19
+
+- **Click again to scroll again**: a click ends a scroll. If you're still holding Win + Ctrl, the next click now starts a new one where you click, like a browser's middle-click scroll. Before, nothing happened until you let go of the keys.
+- **Fixed**: a key could fire when other keys were held as well, after another app (or Global Scroller itself) had hidden them. A click key now counts only when no other Ctrl, Alt, Shift or Win is really held.
+- **Fixed**: a touch-drag click on text that didn't move (in Firefox, on a word) could set off a chain of clicks — the word was selected and clicked over and over until you let go of the keys. Windows turns the made-up finger's tap into a click, and that click was taken for yours. Now only a click you really make counts.
+- **Fixed**: after Global Scroller had run for a day or so, the round scroll mark could appear behind the window you scroll. It now comes to the front every time.
+
 ## 0.2.1 — 2026-11-14
 
 - **New keys, on the left click**: **Win + Ctrl + click** scrolls, **Win + Shift + click** is touch drag. With a pen, a touch of the tip is enough now. If you never changed your keys, these replace the old right-click ones. The old ones still work if you set them in Settings > Keys.

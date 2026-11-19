@@ -200,6 +200,7 @@ FakeFinger(flags, x, y) {
     return 1
 }
 KitTouch.fake := FakeFinger
+Scroll.pressed := (b) => true           ; the clicks below are yours, unless a check says not
 Scroll.how := "touch", Scroll.state := "sticky"
 Scroll.TouchMove({x: -30000, y: -30000})
 Scroll.TouchMove({x: -30000, y: -30050})
@@ -238,16 +239,44 @@ Scroll.Start("+#LButton", true)
 Check("left keys: Win + Shift + click drags", Scroll.how "|" Scroll.trig "|" KitJoin(Scroll.waits, ","), "touch|LButton|Shift")
 Scroll.Stop("*LButton")
 Check("left keys: the next left press is the next drag, not the end", Scroll.state "|" Scroll.drag, "armed|1")
+; a tap of the finger comes back from Windows as a left click that is not
+; physically down: it is not the next drag (it was, over and over, in Firefox)
+KitTouch.Up(), Scroll.liftAt := A_TickCount     ; the finger just lifted
+downs := Finger.downs
+Scroll.pressed := (b) => false
+Scroll.Stop("*LButton")
+Check("tap: the click Windows makes from the finger is not the next drag", Finger.downs "|" KitTouch.active "|" Scroll.state, downs "|0|armed")
+Check("tap: Esc still counts", Scroll.Real("Esc"), 1)
+Scroll.liftAt := A_TickCount - 1000
+Check("tap: a quick real click, already up, long after any finger - counts", Scroll.Real("*LButton"), 1)
+Scroll.liftAt := A_TickCount
+Scroll.pressed := (b) => true
 Scroll.Stop()
 Scroll.Start("^#LButton")
 Check("left keys: Win + Ctrl + click scrolls, waiting for Ctrl", Scroll.how "|" Scroll.trig "|" KitJoin(Scroll.waits, ","), "smooth|LButton|Ctrl")
 Scroll.Stop("*LButton")
 Check("left keys: a left click while scrolling ends it", Scroll.state, "")
+Check("again: keys let go, no click starts it again", Scroll.restart, 0)
+; ended by a click with Ctrl + Win still held (still hidden from programs)
+Scroll.Start("^#LButton")
+Scroll.hidden := true
+Scroll.Stop("*LButton")
+Check("again: ended, keys still held - the next click may start it", Scroll.state "|" Scroll.restart, "|1")
+Scroll.pressed := (b) => false, Scroll.liftAt := A_TickCount
+Scroll.Again("*LButton")
+Check("again: not by a click Windows made from the finger", Scroll.state "|" Scroll.restart, "|1")
+Scroll.pressed := (b) => true
+Scroll.Again()
+Check("again: ... and does, the same way, where it is clicked", Scroll.state "|" Scroll.how "|" Scroll.restart, "armed|smooth|0")
+Scroll.hidden := false
+Scroll.Stop()
+Check("again: not once the keys are let go", Scroll.restart, 0)
 Critical("Off")
 Scroll.holding := ""
 IniWrite("wheel", ini, "Scroll", "Mode")
 Scroll.Load()
 KitTouch.fake := ""
+Scroll.pressed := "", Scroll.liftAt := -100000
 Scroll.how := "wheel"
 
 try DirDelete(T, true)

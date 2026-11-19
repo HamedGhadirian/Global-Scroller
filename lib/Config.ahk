@@ -5,7 +5,7 @@
 
 ; MAJOR.MINOR.PATCH - a dash makes it a test version. The release build reads
 ; it from this line, and the tag that starts the build must match it.
-global GlobalScrollerVersion := "0.2.1"
+global GlobalScrollerVersion := "0.2.2"
 
 ; The settings window's own rows, under GENERAL and KEYS (Kit\SettingsWin.ahk
 ; builds the window and saves each row the moment it changes; Scroll.Load

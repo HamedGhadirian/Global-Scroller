@@ -13,6 +13,8 @@
 ; HOLD OR TAP ([Scroll] Hold=1, the default)
 ;   hold   keep the key's Win and Alt (or its mouse button) held after the
 ;          click: it scrolls while you hold, and stops when you let go.
+;          A click stops it too; keep holding and the next click starts a
+;          new one where it is clicked (see AgainKey).
 ;   tap    let go quickly (under TapTime, 0.3 s) and it stays on until a
 ;          click or Esc - the way a browser's middle-click scroll works.
 ; It is made for a mouse. A pen works where its driver makes it behave as one.
@@ -68,9 +70,11 @@ class Scroll {
     static hidden := false, hiddenKeys := []
     static ticker := "", stopper := "", swallow := "", piece := 30
     static drag := false            ; touch: a drag per click of its button while the keys are held
+    static restart := false, againFn := "", readyFn := "", startHk := "", startTouch := false
     ; for the tests: a pointer and a "still held?" of their own, and no live
     ; keys, so a real click is never swallowed
-    static pointer := "", holding := "", clicks := true
+    static pointer := "", holding := "", clicks := true, pressed := ""
+    static liftAt := -100000        ; when the made-up finger last lifted (Real)
 
     static SmoothStep := 6          ; smooth: the piece of wheel sent at once (a notch is 120)
     static MarkSize := 28
@@ -80,6 +84,8 @@ class Scroll {
         this.ticker := ObjBindMethod(Scroll, "Tick")
         this.stopper := ObjBindMethod(Scroll, "Stop")
         this.swallow := (*) => 0
+        this.againFn := ObjBindMethod(Scroll, "Again")
+        this.readyFn := (*) => Scroll.Ready()
         ; A held Alt repeats some 30 times a second and each repeat is swallowed by a
         ; hotkey here - far past AutoHotkey's "70 hotkeys in 2 seconds" alarm.
         A_MaxHotkeysPerInterval := 5000
@@ -141,6 +147,8 @@ class Scroll {
         Critical
         if (this.state != "")
             return
+        this.AgainKey(false)
+        this.startHk := hk, this.startTouch := touch
         ctx := DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
         p := this.Cursor()
         this.x := p.x, this.y := p.y
@@ -219,10 +227,7 @@ class Scroll {
     static Stop(hk := "") {
         if (this.state = "")
             return
-        ; A program that does not take touch is handed the touch as a left
-        ; click. The first one, right after the touch went down, is that -
-        ; not you.
-        if (KitTouch.active && hk = "*LButton" && A_TickCount - KitTouch.at < 250)
+        if !this.Real(hk)
             return
         if (this.drag && this.trig != "" && hk = "*" this.trig) {
             this.Press()                            ; touch drag: the button again is the next drag
@@ -232,9 +237,58 @@ class Scroll {
         this.drag := false
         this.Keys(false)
         this.mark.Hide()
+        if KitTouch.active
+            this.liftAt := A_TickCount          ; see Real
         KitTouch.Up()                           ; lifted moving, so the page glides on
         if !this.hidden
             SetTimer(this.ticker, 0)
+        else
+            this.AgainKey(true)                 ; the keys are still held: a click starts again
+    }
+
+    ; ENDED, KEYS STILL HELD. A click ended it, but Ctrl and Win (or the
+    ; key's own modifiers) are still down. They are still hidden from
+    ; programs - and so from the key itself, which then would not come again
+    ; until they were let go and pressed anew. So while they stay held, the
+    ; key's own button starts a new one where it is clicked, the way a
+    ; browser's middle-click scroll starts again. Only while Ready (not over
+    ; a program in [Programs] Ignore) - anywhere else the click is left alone.
+    ; Gone the moment the keys are let go (Hide) or a new one starts.
+    static AgainKey(on) {
+        if (on = this.restart)
+            return
+        this.restart := on
+        if (!this.clicks || this.trig = "" || this.trig ~= "i)^(Esc|Escape)$")
+            return
+        HotIf(this.readyFn)
+        try Hotkey("*" this.trig, this.againFn, on ? "On" : "Off")
+        HotIf()
+    }
+
+    static Again(hk := "", *) {
+        if (this.restart && this.Real(hk))
+            this.Start(this.startHk, this.startTouch)
+    }
+
+    ; A click you made, not one Windows made from the finger. A tap of the
+    ; made-up finger, in a program that does not take it as touch, comes back
+    ; as a left click some 50 ms after the finger lifts - tested 2026-11-19 -
+    ; and that click is not physically down. Taken as yours, it was the next
+    ; drag: another tap, another click, and so on while the keys were held -
+    ; in Firefox a word got selected and clicked over and over. (The guess it
+    ; replaces, "the first click within 250 ms of the finger going down",
+    ; missed it: that click comes after the lift.) Keys other than mouse
+    ; buttons always count. So does any click while no finger is down and
+    ; none lifted in the last FingerClickMs: such clicks come only then, and
+    ; a quick real click may already be up again by the time this runs.
+    static FingerClickMs := 400
+    static Real(hk) {
+        b := RegExReplace(hk, "^\*")
+        if !(b ~= "i)^(L|R|M|X1|X2)Button$")
+            return true
+        if (this.pressed ? this.pressed.Call(b) : GetKeyState(b, "P"))
+            return true
+        return !KitTouch.active && A_TickCount - this.liftAt > Scroll.FingerClickMs
     }
 
     ; While it is on, every click ends it and is swallowed - and AutoHotkey
@@ -291,6 +345,7 @@ class Scroll {
         for k in this.hiddenKeys
             try Hotkey("*" k, "Off")
         this.hidden := false
+        this.AgainKey(false)
     }
 
     ;----------------------------------------------------------------------------
@@ -418,8 +473,10 @@ class Scroll {
             return
         if GetKeyState(this.trig, "P")
             KitTouch.Move(p.x, p.y)
-        else
+        else {
+            this.liftAt := A_TickCount              ; see Real
             KitTouch.Up()
+        }
     }
 
     ; the key's button, pressed again while the keys are still held
@@ -469,6 +526,11 @@ class Scroll {
 
     static ShowMark(x, y) {
         size := Scroll.MarkSize
+        ; to the front of the always-on-top windows first: the flag alone is not
+        ; enough - kept hidden between scrolls, the mark sinks below ordinary
+        ; windows after a day or so and would open behind the page. Never activates.
+        DllCall("SetWindowPos", "ptr", this.mark.Hwnd, "ptr", -1                ; HWND_TOPMOST
+            , "int", 0, "int", 0, "int", 0, "int", 0, "uint", 0x13)             ; NOSIZE|NOMOVE|NOACTIVATE
         this.mark.Show("NA x" (x - size // 2) " y" (y - size // 2) " w" size " h" size)
     }
 }
